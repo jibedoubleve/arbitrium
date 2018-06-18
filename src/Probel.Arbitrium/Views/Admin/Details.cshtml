@@ -1,0 +1,36 @@
+﻿@model Probel.Arbitrium.ViewModels.Admin.VoteViewModel
+
+<h2>Details</h2>
+
+<div>
+    <h3>Poll</h3>
+    <hr />
+    <p>
+        @Html.DisplayFor(model => model.Poll.Question)
+    </p>
+</div>
+<div>
+    <h4>@Html.DisplayNameFor(model => model.Poll.Choices)</h4>
+    <hr />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Choice</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var choice in Model.Poll.Choices)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => choice.Text)</td>
+                    <td><a asp-action="Vote" asp-route-userId="@Model.UserId" asp-route-choiceId="@choice.Id">Vote</a> </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Poll.Id">Edit</a> |
+    <a asp-action="Polls" asp-route-userId="@Model.UserId">Back to List</a>
+</div>

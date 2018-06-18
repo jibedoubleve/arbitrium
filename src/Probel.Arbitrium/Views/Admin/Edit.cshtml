@@ -1,0 +1,17 @@
+﻿@model Probel.Arbitrium.ViewModels.Admin.RawPollViewModel
+<h2>Edit poll</h2>
+<form asp-action="Create" role="Form">
+    <div>
+        <label asp-for="@Model.Question"></label>
+        <input asp-for="@Model.Question" />
+    </div>
+    <div>
+        <label asp-for="@Model.Choices"></label>
+        <textarea asp-for="@Model.Choices" rows="10" cols="40"></textarea>
+    </div>
+    <div>
+        <input asp-for="@Model.UserId" hidden />
+        <button id="btnCancel" type="button">Cancel</button>
+        <button id="btn" type="submit">Submit</button>
+    </div>
+</form>

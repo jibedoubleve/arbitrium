@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Probel.Arbitrium.Model;
+using Probel.Arbitrium.Models;
 
 namespace Probel.Arbitrium
 {
@@ -17,18 +17,18 @@ namespace Probel.Arbitrium
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();ddd
+                app.UseBrowserLink();
             }
             else
             {
-                app.UseExceptionHandler("Home/Error");
+                app.UseExceptionHandler("Admin/Error");
             }
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Login}"
+                    template: "{controller=Login}/{action=Account}"
                 );
             });
         }
@@ -39,7 +39,7 @@ namespace Probel.Arbitrium
         {
             services.AddMvc();
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.AspNetCore.NewDb;Trusted_Connection=True;ConnectRetryCount=0";
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=PollsDb;Trusted_Connection=True;MultipleActiveResultSets=true";
             services.AddDbContext<PollContext>(options => options.UseSqlServer(connection));
         }
 

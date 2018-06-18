@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace Probel.Arbitrium.Model
+namespace Probel.Arbitrium.Models
 {
-    public class User : Model
+    public class Choice : Model
     {
         #region Properties
 
+        public Poll Poll { get; set; }
+
+        public string Text { get; set; }
+
         public IEnumerable<Decision> Decisions { get; set; }
-        public string Login { get; set; }
-        public string PasswordHash { get; set; }
 
         #endregion Properties
     }
