@@ -66,6 +66,7 @@ namespace Probel.Arbitrium.Controllers
                 });
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Edit(RawPollViewModel vm)
         {

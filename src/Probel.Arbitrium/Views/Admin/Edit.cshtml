@@ -11,7 +11,7 @@
     </div>
     <div>
         <input asp-for="@Model.UserId" hidden />
-        <button id="btnCancel" type="button">Cancel</button>
+        <a asp-action="EditPolls" asp-route-userId="@Model.UserId">Cancel</a>
         <button id="btn" type="submit">Submit</button>
     </div>
 </form>
