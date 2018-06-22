@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace Probel.Arbitrium.Models
 {
-    public class User : Model
+    public class User : IdentityUser<long>
     {
         #region Properties
-
         public IEnumerable<Decision> Decisions { get; set; }
-        public string Login { get; set; }
-        public string PasswordHash { get; set; }        
 
         #endregion Properties
     }

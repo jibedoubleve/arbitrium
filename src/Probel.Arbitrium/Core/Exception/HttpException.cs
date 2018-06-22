@@ -19,5 +19,7 @@ namespace Probel.Arbitrium.Core.Exception
 
         public static HttpException NotFound => new HttpException("Error 404 - Not Found");
         public static HttpException Unauthorized => new HttpException("Error 401 - Unauthorized");
+        public static HttpException BadRequest => new HttpException("Error 400 - Bad Request");
+        public static HttpException InternalServerError =>new HttpException("Error 500 - Internal Server Error");
     }
 }

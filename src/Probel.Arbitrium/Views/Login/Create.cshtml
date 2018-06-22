@@ -1,36 +1,25 @@
-﻿@model Probel.Arbitrium.ViewModels.NewUserViewModel
-
-<h2>Create new user</h2>
-
-<h4>User</h4>
+﻿@model Probel.Arbitrium.ViewModels.NewLoginViewModel
+<h2>Register</h2>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Login" class="control-label"></label>
-                <input asp-for="Login" class="form-control" />
-                <span asp-validation-for="Login" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PasswordConfirmation" class="control-label"></label>
-                <input asp-for="PasswordConfirmation" class="form-control" />
-                <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Login" class="control-label"></label>
+        <input asp-for="Login" class="form-control" />
+        <span asp-validation-for="Login" class="text-danger"></span>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PasswordConfirmation" class="control-label"></label>
+        <input asp-for="PasswordConfirmation" class="form-control" />
+        <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="Create" />        
+        <a asp-action="Account" class="btn btn-default">Cancel</a>
+    </div>
+</form>
 

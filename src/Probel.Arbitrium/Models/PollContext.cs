@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Probel.Arbitrium.Models
 {
@@ -22,6 +23,12 @@ namespace Probel.Arbitrium.Models
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<IdentityUserClaim<long>> IdentityUserClaims { get; set; }
+
+        public DbSet<IdentityUserRole<long>> IdentityUserRoles { get; set; }
+
+        public DbSet<IdentityRole<long>> IdentityRoles { get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -32,6 +39,8 @@ namespace Probel.Arbitrium.Models
                 .HasOne(p => p.Poll)
                 .WithMany(p => p.Choices)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<IdentityUserRole<long>>().HasKey(p => new { p.UserId, p.RoleId });
         }
 
         #endregion Methods

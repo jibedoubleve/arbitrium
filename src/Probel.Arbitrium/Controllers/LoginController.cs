@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Probel.Arbitrium.Business;
 using Probel.Arbitrium.Core.Exception;
@@ -10,11 +13,16 @@ using System.Threading.Tasks;
 
 namespace Probel.Arbitrium.Controllers
 {
+    /// <remarks>
+    /// https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-2.1&tabs=visual-studio%2Caspnetcore2x
+    /// </remarks>
     public class LoginController : Controller
     {
         #region Fields
 
         private readonly PollContext PollContext;
+        private readonly SignInManager<User> SignInManager;
+        private readonly UserManager<User> UserManager;
 
         private readonly ILogService Log = new LogService();
 
@@ -22,8 +30,10 @@ namespace Probel.Arbitrium.Controllers
 
         #region Constructors
 
-        public LoginController(PollContext pollContext)
+        public LoginController(PollContext pollContext, SignInManager<User> signInManager, UserManager<User> userManager)
         {
+            SignInManager = signInManager;
+            UserManager = userManager;
             PollContext = pollContext;
         }
 
@@ -32,69 +42,53 @@ namespace Probel.Arbitrium.Controllers
         #region Methods
 
         [HttpPost]
-        public async Task<IActionResult> Account(string login)
+        public async Task<IActionResult> Account(LoginViewModel user)
         {
-            var user = await (from p in PollContext.Users
-                              where p.Login.ToLower() == login.ToLower()
-                              select p).SingleOrDefaultAsync();
+            var result = await SignInManager.PasswordSignInAsync(user.Login,
+                                                                 user.Password,
+                                                                 true, lockoutOnFailure: false);
 
-
-            var result = (user != null)
-                ? RedirectToAction("Password", new PasswordViewModel { UserId = user.Id })
-                : RedirectToAction("Create", new { login });
-            return result;
-        }
-
-        [HttpGet]
-        public IActionResult Account() => View();
-
-        [HttpGet]
-        public async Task<IActionResult> Password(long userId)
-        {
-            var user = await PollContext.Users.FindAsync(userId);
-            return View(new PasswordViewModel() { UserId = userId });
-        }
-
-        [HttpPost, ActionName("Password")]
-        public async Task<IActionResult> PasswordConfirmed(PasswordViewModel pvm)
-        {
-            var pwd = new PasswordHelper();
-            var u = await PollContext.Users.FindAsync(pvm.UserId);
-            if (u == null) { throw HttpException.NotFound; }
-
-            if (pwd.IsPasswordValid(u, pvm.Password))
+            if (result.Succeeded)
             {
+                var u = await UserManager.FindByEmailAsync(user.Login);
                 return RedirectToAction("Polls", "Admin", new { UserId = u.Id });
             }
-            else { return View(); }
+            else { throw HttpException.Unauthorized; }
         }
 
         [HttpGet]
-        public IActionResult Create(string login)
+        public async Task<IActionResult> Account()
         {
-            var user = new NewUserViewModel() { Login = login };
-            return View(user);
+
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            return View();
         }
 
-        [HttpPost, ActionName("Create")]
-        public async Task<IActionResult> CreateConfirmed(NewUserViewModel user)
+        [HttpGet]
+        public IActionResult Create()
         {
-            if (user.Password == user.PasswordConfirmation)
+            return View(new NewLoginViewModel());
+        }
+
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Create")]
+        public async Task<IActionResult> CreateConfirmed(NewLoginViewModel newUser)
+        {
+            if (newUser.Password == newUser.PasswordConfirmation)
             {
-                var passwordHash = new PasswordHelper().GetHash(user.Password);
-                var u = new User()
+                var user = new User() { Email = newUser.Login, UserName = newUser.Login };
+                var result = await UserManager.CreateAsync(user, newUser.Password);
+                if (result.Succeeded)
                 {
-                    Login = user.Login,
-                    PasswordHash = passwordHash
-                };
-
-                var r = PollContext.Users.Add(u);
-                await PollContext.SaveChangesAsync();
-
-                return RedirectToAction("Polls", "Admin", new { UserId = r.Entity.Id });
-
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Polls", "Admin");
+                }
+                else { throw HttpException.InternalServerError; }
             }
-            else { return RedirectToAction("Create", new { user.Login }); }
+            else { return View(new NewLoginViewModel()); }
         }
 
         #endregion Methods

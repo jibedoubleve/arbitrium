@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Probel.Arbitrium.Business;
 using Probel.Arbitrium.Core.Exception;
@@ -17,13 +18,16 @@ namespace Probel.Arbitrium.Controllers
         #region Fields
 
         private readonly PollContext PollContext;
+        private readonly long UserId;
 
         #endregion Fields
 
         #region Constructors
 
-        public AdminController(PollContext pollContext)
+        public AdminController(PollContext pollContext, UserManager<User> userManager)
         {
+            UserId = userManager.GetUserAsync(HttpContext.User)?.Id ?? 0;
+
             PollContext = pollContext;
         }
 
@@ -32,7 +36,7 @@ namespace Probel.Arbitrium.Controllers
         #region Methods
 
         [HttpGet]
-        public IActionResult Create(long userId) => View(new RawPollViewModel() { UserId = userId });
+        public IActionResult Create() => View(new RawPollViewModel() { UserId = UserId });
 
         [HttpPost]
         public async Task<IActionResult> Create(RawPollViewModel vm)
@@ -48,7 +52,7 @@ namespace Probel.Arbitrium.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(long pollId, long userId)
+        public async Task<IActionResult> Edit(long pollId)
         {
             var poll = await (from p in PollContext.Polls.Include(e => e.Choices)
                               where p.Id == pollId
@@ -62,7 +66,7 @@ namespace Probel.Arbitrium.Controllers
                 {
                     Choices = converter.GetTextFromChoices(),
                     Question = poll.Question,
-                    UserId = userId,
+                    UserId = UserId,
                 });
             }
         }
@@ -90,14 +94,14 @@ namespace Probel.Arbitrium.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(long pollId, long userId)
+        public async Task<IActionResult> Details(long pollId)
         {
             var poll = await (from p in PollContext.Polls.Include(e => e.Choices)
                               where p.Id == pollId
                               select p).SingleOrDefaultAsync();
 
             if (poll == null) { throw HttpException.NotFound; }
-            return View(new VoteViewModel() { Poll = poll, UserId = userId });
+            return View(new VoteViewModel() { Poll = poll, UserId = UserId });
         }
 
         public string Error()
@@ -106,38 +110,38 @@ namespace Probel.Arbitrium.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Polls(long userId)
+        public async Task<IActionResult> Polls()
         {
             var query = new QueryPolls(PollContext);
-            var newPolls = await query.GetNewPollsAsync(userId);
-            var oldPolls = await query.GetOldPollsAsync(userId);
+            var newPolls = await query.GetNewPollsAsync(UserId);
+            var oldPolls = await query.GetOldPollsAsync(UserId);
 
             var vm = new PollCollectionViewModel()
             {
                 NewPolls = newPolls,
                 OldPolls = oldPolls,
-                UserId = userId,
+                UserId = UserId,
             };
             return View(vm);
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditPolls(long userId)
+        public async Task<IActionResult> EditPolls()
         {
             var query = new QueryPolls(PollContext);
             var result = await query.GetEditablePollsAsync();
             var vm = new PollCollectionViewModel()
             {
                 NewPolls = result,
-                UserId = userId
+                UserId = UserId
             };
             return View(vm);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Vote(long choiceId, long userId)
+        public async Task<IActionResult> Vote(long choiceId)
         {
-            var user = await PollContext.Users.FindAsync(userId);
+            var user = await PollContext.Users.FindAsync(UserId);
             var choice = await PollContext.Choices.FindAsync(choiceId);
 
             if (user == null) { throw HttpException.NotFound; }
@@ -152,19 +156,19 @@ namespace Probel.Arbitrium.Controllers
             PollContext.Decisions.Add(decision);
             await PollContext.SaveChangesAsync();
 
-            return RedirectToAction("Polls", new { UserId = userId });
+            return RedirectToAction("Polls", new { UserId = UserId });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Result(long pollId, long userId)
+        public async Task<IActionResult> Result(long pollId)
         {
-            var user = await PollContext.Users.FindAsync(userId);
+            var user = await PollContext.Users.FindAsync(UserId);
             var choice = await PollContext.Polls.FindAsync(pollId);
 
             if (user == null) { throw HttpException.NotFound; }
             if (choice == null) { throw HttpException.NotFound; }
 
-            var pollResult = await new QueryPolls(PollContext).GetResultAsync(userId, pollId);
+            var pollResult = await new QueryPolls(PollContext).GetResultAsync(UserId, pollId);
 
             return View(pollResult);
         }
