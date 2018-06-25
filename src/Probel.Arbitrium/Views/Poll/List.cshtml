@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model PollCollectionViewModel
+<h2>On attend ton avis...</h2>
+<table class="table table-hover">
+    <tbody>
+        @foreach (var item in Model.NewPolls)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Question)
+                </td>
+                <td style="width:20%">
+                    <a asp-action="Vote" asp-route-pollId="@item.Id">Voter</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h2>Tes votes</h2>
+<table class="table table-hover">
+    <tbody>
+        @foreach (var item in Model.OldPolls)
+        {
+            <tr class="table">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Question)
+                </td>
+                <td style="width:20%">
+                    <a asp-action="Result" asp-route-pollId="@item.Id">Résultats des élections</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

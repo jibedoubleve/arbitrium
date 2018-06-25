@@ -9,6 +9,21 @@ namespace Probel.Arbitrium.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "IdentityRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ClaimType = table.Column<string>(nullable: true),
+                    ClaimValue = table.Column<string>(nullable: true),
+                    RoleId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityRoleClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "IdentityRoles",
                 columns: table => new
                 {
@@ -158,6 +173,9 @@ namespace Probel.Arbitrium.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Decisions");
+
+            migrationBuilder.DropTable(
+                name: "IdentityRoleClaims");
 
             migrationBuilder.DropTable(
                 name: "IdentityRoles");

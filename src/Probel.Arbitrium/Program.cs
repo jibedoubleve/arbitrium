@@ -7,10 +7,14 @@ namespace Probel.Arbitrium
     {
         #region Methods
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            var host = WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
+
+            return host;
+        }
 
         public static void Main(string[] args) => BuildWebHost(args).Run();
 

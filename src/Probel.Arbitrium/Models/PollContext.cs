@@ -19,15 +19,13 @@ namespace Probel.Arbitrium.Models
 
         public DbSet<Decision> Decisions { get; set; }
 
+        public DbSet<IdentityRoleClaim<long>> IdentityRoleClaims { get; set; }
+        public DbSet<IdentityRole<long>> IdentityRoles { get; set; }
+        public DbSet<IdentityUserClaim<long>> IdentityUserClaims { get; set; }
+        public DbSet<IdentityUserRole<long>> IdentityUserRoles { get; set; }
         public DbSet<Poll> Polls { get; set; }
 
         public DbSet<User> Users { get; set; }
-
-        public DbSet<IdentityUserClaim<long>> IdentityUserClaims { get; set; }
-
-        public DbSet<IdentityUserRole<long>> IdentityUserRoles { get; set; }
-
-        public DbSet<IdentityRole<long>> IdentityRoles { get; set; }
 
         #endregion Properties
 

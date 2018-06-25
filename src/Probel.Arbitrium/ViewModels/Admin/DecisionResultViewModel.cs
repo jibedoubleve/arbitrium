@@ -8,9 +8,9 @@ namespace Probel.Arbitrium.ViewModels.Admin
         #region Properties
 
         public int Count { get; set; }
+
         public bool IsYour { get; set; }
-        public string Text { get; set; }
-        public int TotalCount { get; set; }
+
         public decimal Percentage
         {
             get
@@ -19,6 +19,10 @@ namespace Probel.Arbitrium.ViewModels.Admin
                 else { return (((decimal)Count / TotalCount)) * 100; }
             }
         }
+
+        public string Text { get; set; }
+
+        public int TotalCount { get; set; }
 
         #endregion Properties
     }

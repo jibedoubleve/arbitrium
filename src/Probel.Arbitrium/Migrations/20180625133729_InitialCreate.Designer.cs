@@ -11,7 +11,7 @@ using System;
 namespace Probel.Arbitrium.Migrations
 {
     [DbContext(typeof(PollContext))]
-    [Migration("20180622222301_InitialCreate")]
+    [Migration("20180625133729_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,22 @@ namespace Probel.Arbitrium.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("IdentityRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ClaimType");
+
+                    b.Property<string>("ClaimValue");
+
+                    b.Property<long>("RoleId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdentityRoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>

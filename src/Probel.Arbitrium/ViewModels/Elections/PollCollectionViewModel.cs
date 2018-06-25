@@ -1,7 +1,7 @@
 ﻿using Probel.Arbitrium.Models;
 using System.Collections.Generic;
 
-namespace Probel.Arbitrium.ViewModels.Admin
+namespace Probel.Arbitrium.ViewModels.Polls
 {
     public class PollCollectionViewModel
     {
@@ -9,7 +9,6 @@ namespace Probel.Arbitrium.ViewModels.Admin
 
         public IEnumerable<Poll> NewPolls { get; set; }
         public IEnumerable<Poll> OldPolls { get; set; }
-        public long UserId { get; set; }
 
         #endregion Properties
     }

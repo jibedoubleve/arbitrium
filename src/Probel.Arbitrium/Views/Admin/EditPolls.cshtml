@@ -1,13 +1,6 @@
-﻿@model Probel.Arbitrium.ViewModels.Admin.PollCollectionViewModel
-<h2>Edit polls</h2>
-<hr />
+﻿@model PollCollectionViewModel
+<h2>Elections éditables</h2>
 <table class="table">
-    <thead>
-        <tr>
-            <th>Poll</th>
-            <th></th>
-        </tr>
-    </thead>
     <tbody>
         @foreach (var item in Model.NewPolls)
         {
@@ -16,15 +9,11 @@
                     @Html.DisplayFor(modelItem => item.Question)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-pollId="@item.Id" asp-route-userId="@Model.UserId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-pollId="@item.Id" class="btn btn-link">Editer</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-link">Supprimer</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
-<div>
-    <a asp-action="Polls" asp-route-userId="@Model.UserId">Back to List</a>
-</div>
 

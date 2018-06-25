@@ -1,12 +1,12 @@
 ﻿using Probel.Arbitrium.Models;
 
-namespace Probel.Arbitrium.ViewModels.Admin
+namespace Probel.Arbitrium.ViewModels.Polls
 {
     public class VoteViewModel
     {
         #region Properties
 
-        public long UserId { get; set; }
+        public long ChoiceId { get; set; }
         public Poll Poll { get; set; }
 
         #endregion Properties

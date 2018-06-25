@@ -1,4 +1,4 @@
-﻿namespace Probel.Arbitrium.ViewModels
+﻿namespace Probel.Arbitrium.ViewModels.Login
 {
     public class LoginViewModel
     {

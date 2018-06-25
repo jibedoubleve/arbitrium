@@ -1,0 +1,21 @@
+﻿@model VoteViewModel
+<h2>Voter</h2>
+<hr />
+<div>
+    <h3>@Html.DisplayFor(model => model.Poll.Question)</h3>
+    <hr />
+</div>
+<form asp-action="Vote" role="form">
+    @foreach (var choice in Model.Poll.Choices)
+    {
+        <div class="form-check">
+            <input asp-for="ChoiceId" type="radio" value="@choice.Id" class="form-check-input" />
+            <label>@choice.Text</label>
+        </div>
+    }
+    <div>
+        <hr />
+        <button class="btn btn-primary">Valider</button>
+        <a asp-action="List" asp-controller="Poll" class="btn btn-link">Retour</a>
+    </div>
+</form>

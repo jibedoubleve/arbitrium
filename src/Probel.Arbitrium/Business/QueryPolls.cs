@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Probel.Arbitrium.Core.Exception;
+using Probel.Arbitrium.Exceptions;
 using Probel.Arbitrium.Models;
 using Probel.Arbitrium.ViewModels.Admin;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -73,7 +72,7 @@ namespace Probel.Arbitrium.Business
             var poll = await (from p in Context.Polls.Include(e => e.Choices)
                               where p.Id == pollId
                               select p).SingleOrDefaultAsync();
-            if (poll == null) { throw HttpException.NotFound; }
+            if (poll == null) { throw new EntityNotFoundException(typeof(Poll), pollId); }
             else
             {
                 var r = new PollResultViewModel();
