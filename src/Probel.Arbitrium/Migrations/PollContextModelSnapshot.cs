@@ -130,6 +130,20 @@ namespace Probel.Arbitrium.Migrations
                     b.ToTable("Polls");
                 });
 
+            modelBuilder.Entity("Probel.Arbitrium.Models.Setting", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Key");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Probel.Arbitrium.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -184,7 +198,8 @@ namespace Probel.Arbitrium.Migrations
 
                     b.HasOne("Probel.Arbitrium.Models.User", "User")
                         .WithMany("Decisions")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

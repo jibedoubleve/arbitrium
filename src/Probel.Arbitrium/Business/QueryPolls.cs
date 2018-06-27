@@ -2,6 +2,7 @@
 using Probel.Arbitrium.Exceptions;
 using Probel.Arbitrium.Models;
 using Probel.Arbitrium.ViewModels.Admin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,6 @@ namespace Probel.Arbitrium.Business
         #endregion Fields
 
         #region Constructors
-
         public QueryPolls(PollContext context)
         {
             Context = context;
@@ -51,8 +51,11 @@ namespace Probel.Arbitrium.Business
 
         public async Task<IEnumerable<Poll>> GetNewPollsAsync(long userId)
         {
+            var now = DateTime.Now.ToUniversalTime();
             var polls = await (from p in Context.Polls.Include(p => p.Choices).ThenInclude(c => c.Decisions)
                                where 0 == p.Choices.Where(c => c.Decisions.Where(d => d.User.Id == userId).Count() > 0).Count()
+                               && p.EndDate > now
+                               && p.StartDate <= now
                                select p).ToListAsync();
 
             return polls;
@@ -60,8 +63,10 @@ namespace Probel.Arbitrium.Business
 
         public async Task<IEnumerable<Poll>> GetOldPollsAsync(long userId)
         {
+            var now = DateTime.Now;
             var polls = await (from p in Context.Polls.Include(p => p.Choices).ThenInclude(c => c.Decisions)
                                where 0 != p.Choices.Where(c => c.Decisions.Where(d => d.User.Id == userId).Count() > 0).Count()
+                               || p.EndDate < now
                                select p).ToListAsync();
 
             return polls;

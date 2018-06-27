@@ -1,9 +1,17 @@
 ﻿@model Probel.Arbitrium.ViewModels.Admin.RawPollViewModel
 <h2>Créer élection</h2>
-<form asp-action="Create" role="Form">
+<form asp-action="CreatePoll" role="Form">
     <div class="form-group">
         <label asp-for="Question" class="form-check-label"></label>
         <input asp-for="Question" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="StartDate" class="form-check-label">Début de l'élection</label>
+        <input type="datetime" asp-for="StartDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate" class="form-check-label">Fin de l'élection</label>
+        <input type="datetime" asp-for="EndDate" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Choices" class="form-check-label">Choix</label>

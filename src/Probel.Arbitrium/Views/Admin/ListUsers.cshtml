@@ -1,0 +1,52 @@
+﻿@model UserCollectionViewModel
+
+<h2>Utilisateurs enregistrés</h2>
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.RegisteredUsers)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td style="width:50%">
+                    <form asp-action="DeleteUser" role="form">
+                        <a asp-action="UpdatePassword" asp-route-userId="@item.Id" class="btn btn-link">Mot de passe</a> |
+                        <a asp-action="UpdateRole" asp-route-userId="@item.Id" class="btn btn-link">Roles</a> |
+                        <button class="btn btn-link" type="button" data-toggle="modal" data-target="#confirmDelete">Supprimer</button>
+                        <!-- modal box to confirm deletion -->
+                        <div class="modal" id="confirmDelete">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Confirmation</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        Veux-tu effacer cet utilisateur?
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button asp-action="DeleteUser" asp-route-userId="@item.Id" class="btn btn-danger">Confirmer</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Annuler</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

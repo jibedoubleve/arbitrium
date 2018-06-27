@@ -19,6 +19,8 @@ namespace Probel.Arbitrium.Exceptions
 
         public SignInResult SignInResult { get; private set; }
 
+        public override string Message => $"Connection failed. Possible cause is '{SignInResult.ToString()}'";
+
         #endregion Properties
     }
 }

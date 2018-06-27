@@ -11,8 +11,8 @@ using System;
 namespace Probel.Arbitrium.Migrations
 {
     [DbContext(typeof(PollContext))]
-    [Migration("20180625133729_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20180629085815_V0.1-InitialCreate")]
+    partial class V01InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -131,6 +131,20 @@ namespace Probel.Arbitrium.Migrations
                     b.ToTable("Polls");
                 });
 
+            modelBuilder.Entity("Probel.Arbitrium.Models.Setting", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Key");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Probel.Arbitrium.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -185,7 +199,8 @@ namespace Probel.Arbitrium.Migrations
 
                     b.HasOne("Probel.Arbitrium.Models.User", "User")
                         .WithMany("Decisions")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

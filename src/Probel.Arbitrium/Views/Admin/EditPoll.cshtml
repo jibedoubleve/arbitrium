@@ -1,6 +1,6 @@
 ﻿@model RawPollViewModel
 <h2>Editer une élection</h2>
-<form asp-action="Edit" role="Form">
+<form asp-action="EditPoll" role="Form">
     <div class="form-group">
         <label asp-for="@Model.Question" class="form-check-label"></label>
         <input asp-for="@Model.Question"  class="form-control"/>
@@ -12,6 +12,6 @@
     <div class="form-group">
         <hr />
         <button id="btn" type="submit" class="btn btn-primary">Editer</button>
-        <a asp-action="EditPolls" class="btn btn-light">Annuler</a>
+        <a asp-action="ListPolls" class="btn btn-link">Annuler</a>
     </div>
 </form>

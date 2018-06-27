@@ -1,11 +1,10 @@
 ﻿@model NewLoginViewModel
-<h2>Inscription</h2>
+<h2>Changer le mot de passe</h2>
 <hr />
-<form asp-action="Create" method="post">
+<form asp-action="Edit" asp-controller="Login" method="post">
     <div class="form-group">
         <label asp-for="UserName" class="control-label">Login</label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
+        <input asp-for="UserName" class="form-control"  />
     </div>
     <div class="form-group">
         <label asp-for="Password" class="control-label">Mot de passe</label>
@@ -18,8 +17,7 @@
         <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <input type="submit" class="btn btn-primary" value="Créer" />
+        <input type="submit" class="btn btn-primary" value="Mettre à jour" />
         <a asp-action="Connect" class="btn btn-default">Annuler</a>
     </div>
 </form>
-

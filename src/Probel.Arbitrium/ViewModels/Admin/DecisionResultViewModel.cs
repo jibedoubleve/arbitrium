@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Probel.Arbitrium.Constants;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Probel.Arbitrium.ViewModels.Admin
 {
@@ -11,6 +13,7 @@ namespace Probel.Arbitrium.ViewModels.Admin
 
         public bool IsYour { get; set; }
 
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.Percent)]
         public decimal Percentage
         {
             get

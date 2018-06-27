@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Probel.Arbitrium.Constants;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Probel.Arbitrium.Models
 {
@@ -9,11 +12,28 @@ namespace Probel.Arbitrium.Models
 
         public IEnumerable<Choice> Choices { get; set; }
 
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.DateTime)]
+        public DateTime EndDate { get; set; }
+
+        [NotMapped]
+        public DateTime EndDateLocal => EndDate.ToLocalTime();
+
         public string Question { get; set; }
 
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.DateTime)]
         public DateTime StartDate { get; set; }
 
-        public DateTime EndDate { get; set; }
+        [NotMapped]
+        public DateTime StartDateLocal => StartDate.ToLocalTime();
+
+        [NotMapped]
+        public bool IsOpen => (DateTime.Now.ToUniversalTime() <= EndDate);
+
+        [NotMapped]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.TimeSpan)]
+        public TimeSpan RemainingTime => EndDate - StartDate;
 
         #endregion Properties
     }

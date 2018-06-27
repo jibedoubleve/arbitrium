@@ -9,7 +9,7 @@ namespace Probel.Arbitrium.Exceptions
     {
         #region Constructors
 
-        public IdentityException(IEnumerable<IdentityError> errors) : base(code)
+        public IdentityException(IEnumerable<IdentityError> errors) : base()
         {
             Errors = errors;
         }
@@ -19,6 +19,19 @@ namespace Probel.Arbitrium.Exceptions
         #region Properties
 
         public IEnumerable<IdentityError> Errors { get; private set; }
+
+        public override string Message => ExpandIdentityErrors();
+
+        private string ExpandIdentityErrors()
+        {
+            var result = string.Empty;
+
+            foreach (var error in Errors)
+            {
+                result += $"[{error.Code}] {error.Description}{Environment.NewLine}";
+            }
+            return result.TrimEnd(Environment.NewLine.ToCharArray());
+        }
 
         #endregion Properties
     }

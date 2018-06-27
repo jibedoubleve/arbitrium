@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +17,16 @@ namespace Probel.Arbitrium.Controllers
     {
         #region Fields
 
-        private readonly AuthenticationHelper _auth;
+        private readonly IAuthService _auth;
         private readonly PollContext PollContext;
 
         #endregion Fields
 
         #region Constructors
 
-        public PollController(PollContext pollContext, UserManager<User> userManager, IHttpContextAccessor contextAccessor)
+        public PollController(PollContext pollContext, UserManager<User> userManager, IHttpContextAccessor contextAccessor, IAuthService auth)
         {
-            _auth = new AuthenticationHelper(userManager, contextAccessor);
+            _auth = auth;
 
             PollContext = pollContext;
         }
@@ -34,11 +35,11 @@ namespace Probel.Arbitrium.Controllers
 
         #region Methods
 
-        [HttpGet]
-        public async Task<IActionResult> List()
+        [HttpGet, Authorize]
+        public async Task<IActionResult> ListResults()
         {
             var query = new QueryPolls(PollContext);
-            var uid = await _auth.GetUserId();
+            var uid = await _auth.GetConnectedUserIdAsync();
             var newPolls = await query.GetNewPollsAsync(uid);
             var oldPolls = await query.GetOldPollsAsync(uid);
 
@@ -50,22 +51,37 @@ namespace Probel.Arbitrium.Controllers
             return View(vm);
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
+        public async Task<IActionResult> ListNewPolls()
+        {
+            var query = new QueryPolls(PollContext);
+            var uid = await _auth.GetConnectedUserIdAsync();
+            var newPolls = await query.GetNewPollsAsync(uid);
+
+            var vm = new PollCollectionViewModel()
+            {
+                NewPolls = newPolls,
+            };
+            return View(vm);
+
+        }
+
+        [HttpGet, Authorize]
         public async Task<IActionResult> Result(long pollId)
         {
-            var userId = await _auth.GetUserId();
+            var userId = await _auth.GetConnectedUserIdAsync();
             var user = await PollContext.Users.FindAsync(userId);
             var poll = await PollContext.Polls.FindAsync(pollId);
 
             if (user == null) { throw new EntityNotFoundException(typeof(User), userId); }
             if (poll == null) { throw new EntityNotFoundException(typeof(Poll), pollId); }
 
-            var pollResult = await new QueryPolls(PollContext).GetResultAsync(await _auth.GetUserId(), pollId);
+            var pollResult = await new QueryPolls(PollContext).GetResultAsync(await _auth.GetConnectedUserIdAsync(), pollId);
 
             return View(pollResult);
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Vote(long pollId)
         {
             var poll = await (from p in PollContext.Polls.Include(e => e.Choices)
@@ -76,14 +92,14 @@ namespace Probel.Arbitrium.Controllers
             return View(new VoteViewModel() { Poll = poll });
         }
 
-        [HttpPost, ActionName("Vote")]
+        [HttpPost, ActionName("Vote"), Authorize]
         public async Task<IActionResult> VoteConfirmed(VoteViewModel vm)
         {
             var choiceId = vm.ChoiceId;
 
             if (choiceId == default(long)) { throw new ArgumentException("Unsupported value", nameof(choiceId)); }
 
-            var userId = await _auth.GetUserId();
+            var userId = await _auth.GetConnectedUserIdAsync();
             var user = await PollContext.Users.FindAsync(userId);
             var choice = await PollContext.Choices.FindAsync(choiceId);
 
@@ -99,7 +115,7 @@ namespace Probel.Arbitrium.Controllers
             PollContext.Decisions.Add(decision);
             await PollContext.SaveChangesAsync();
 
-            return RedirectToAction("List", "Poll");
+            return RedirectToAction("ListResult", "Poll");
         }
 
         #endregion Methods

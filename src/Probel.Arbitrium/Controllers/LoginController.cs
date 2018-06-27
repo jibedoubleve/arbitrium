@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Probel.Arbitrium.Business;
 using Probel.Arbitrium.Exceptions;
 using Probel.Arbitrium.Models;
 using Probel.Arbitrium.ViewModels.Login;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +19,8 @@ namespace Probel.Arbitrium.Controllers
     {
         #region Fields
 
+        private readonly IConfigurationService AppConfig;
+        private readonly IAuthService Auth;
         private readonly PollContext PollContext;
         private readonly SignInManager<User> SignInManager;
         private readonly UserManager<User> UserManager;
@@ -25,8 +29,14 @@ namespace Probel.Arbitrium.Controllers
 
         #region Constructors
 
-        public LoginController(PollContext pollContext, SignInManager<User> signInManager, UserManager<User> userManager)
+        public LoginController(PollContext pollContext
+            , SignInManager<User> signInManager
+            , UserManager<User> userManager
+            , IAuthService auth
+            , IConfigurationService appConfig)
         {
+            Auth = auth;
+            AppConfig = appConfig;
             SignInManager = signInManager;
             UserManager = userManager;
             PollContext = pollContext;
@@ -41,24 +51,41 @@ namespace Probel.Arbitrium.Controllers
             var adminRole = new IdentityRole<long>
             {
                 Id = 1,
-                Name = "Admin",
-                NormalizedName = "ADMIN"
+                Name = RoleList.Admin,
+                NormalizedName = RoleList.Admin.ToUpper()
             };
-            var userRole = new IdentityRole<long>
+            var superUserRole = new IdentityRole<long>
             {
                 Id = 2,
-                Name = "User",
-                NormalizedName = "USER"
+                Name = RoleList.SuperUser,
+                NormalizedName = RoleList.SuperUser.ToUpper()
             };
 
-            await roleStore.CreateAsync(userRole);
             await roleStore.CreateAsync(adminRole);
+            await roleStore.CreateAsync(superUserRole);
 
             await UserManager.AddToRoleAsync(user, adminRole.Name);
+            await UserManager.AddToRoleAsync(user, superUserRole.Name);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Connect(LoginViewModel user)
+        [HttpGet, AllowAnonymous]
+        public async Task<IActionResult> Connect()
+        {
+            if (await Auth.HasConnectedUser())
+            {
+                // Clear the existing external cookie to ensure a clean login process
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+                var cfg = await AppConfig.GetFullConfiguration();
+
+                return View(new LoginViewModel { Configuration = cfg });
+            }
+            else { return RedirectToAction("ListNewPolls", "Poll"); }
+        }
+
+        [HttpPost, ActionName("Connect"), AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConnectConfirmed(LoginViewModel user)
         {
             var result = await SignInManager.PasswordSignInAsync(user.Login,
                                                                  user.Password,
@@ -67,37 +94,25 @@ namespace Probel.Arbitrium.Controllers
             if (result.Succeeded)
             {
                 var u = await UserManager.FindByEmailAsync(user.Login);
-                return RedirectToAction("List", "Poll");
+                return RedirectToAction("ListNewPolls", "Poll");
             }
             else { throw new ConnectionException(result); }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Connect()
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        [HttpGet, AllowAnonymous]
+        public IActionResult Create() => View(new NewLoginViewModel());
 
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View(new NewLoginViewModel());
-        }
-
-        [AllowAnonymous]
+        [HttpPost, ActionName("Create"), AllowAnonymous]
         [ValidateAntiForgeryToken]
-        [HttpPost, ActionName("Create")]
         public async Task<IActionResult> CreateConfirmed(NewLoginViewModel newUser)
         {
             if (newUser.Password == newUser.PasswordConfirmation)
             {
+                var u = new UserHelper();
                 var roleStore = new RoleStore<IdentityRole<long>, PollContext, long>(PollContext);
                 var firstUser = !PollContext.Users.Any();
 
-                var user = new User() { Email = newUser.Login, UserName = newUser.UserName };
+                var user = new User() { Email = u.RandomiseEmail(), UserName = newUser.UserName, SecurityStamp = Guid.NewGuid().ToString() };
                 if (firstUser) { user.Id = 1; }
 
                 var result = await UserManager.CreateAsync(user, newUser.Password);
@@ -106,18 +121,42 @@ namespace Probel.Arbitrium.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("List", "Poll");
+                    return RedirectToAction("ListNewPolls", "Poll");
                 }
                 else { throw new IdentityException(result.Errors); }
             }
             else { return View(new NewLoginViewModel()); }
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken, Authorize]
         public async Task<IActionResult> Disconnect()
         {
             await SignInManager.SignOutAsync();
             return RedirectToAction("Connect", "Login");
+        }
+
+        [HttpGet, Authorize]
+        public async Task<IActionResult> Edit()
+        {
+            var user = await Auth.GetConnectedUserAsync();
+            return View(new NewLoginViewModel
+            {
+                UserName = user.UserName
+            });
+        }
+
+        [HttpPost, ActionName("Edit"), Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditConfirmed(NewLoginViewModel model)
+        {
+            if (model.Password == model.PasswordConfirmation)
+            {
+                var user = await Auth.GetConnectedUserAsync();
+                var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+                var result = await UserManager.ResetPasswordAsync(user, token, model.Password);
+                return RedirectToAction("List", "Poll");
+            }
+            else { throw new ServerException("Password and password confirmation does not match."); }
         }
 
         #endregion Methods

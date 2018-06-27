@@ -18,29 +18,40 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item active">
-                        <a asp-action="List" asp-controller="Poll" class="nav-link">Elections</a>
+                        <a asp-action="ListNewPolls" asp-controller="Poll" class="nav-link">Elections</a>
                     </li>
-                    @if (ViewContext.HttpContext.User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item active">
-                            <a asp-action="Create" asp-controller="Admin" class="nav-link">Nouvelle élection</a>
-                        </li>
-                        <li class="nav-item active">
-                            <a asp-action="EditPolls" asp-controller="Admin" class="nav-link">Editer une élection</a>
-                        </li>
-                    }
+                    <li class="nav-item active">
+                        <a asp-action="ListResults" asp-controller="Poll" class="nav-link">Résultats</a>
+                    </li>
+
                 </ul>
             </div>
             <form class="form-inline my-2 my-lg-0" asp-action="Disconnect" asp-controller="Login">
                 <div class="btn-group" role="group">
-                    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @User.Identity.Name
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDrop1">
+                        <h6 class="dropdown-header">Utilisateur</h6>
+                        <a asp-action="Edit" asp-controller="Login" class="dropdown-item">Changer de mot de passe</a>
+                        @if (ViewContext.HttpContext.User.IsInRole("SuperUser"))
+                        {
+                            <hr />
+                            <h6 class="dropdown-header">Gestion des élections</h6>
+                            <a asp-action="CreatePoll" asp-controller="Admin" class="dropdown-item">Nouvelle élection</a>
+                            <a asp-action="ListPolls" asp-controller="Admin" class="dropdown-item">Editer une élection</a>
+                        }
+                        @if (ViewContext.HttpContext.User.IsInRole("Admin"))
+                        {
+                            <hr />
+                            <h6 class="dropdown-header">Administration</h6>
+                            <a asp-action="Configuration" asp-controller="Admin" class="dropdown-item">Réglages</a>
+                            <a asp-action="ListUsers" asp-controller="Admin" class="dropdown-item">Utilisateurs</a>
+                        }
+                        <hr />
                         <button class="dropdown-item" type="submit">Déconnexion</button>
                     </div>
                 </div>
-
             </form>
         }
     </nav>

@@ -24,6 +24,7 @@ namespace Probel.Arbitrium.Models
         public DbSet<IdentityUserClaim<long>> IdentityUserClaims { get; set; }
         public DbSet<IdentityUserRole<long>> IdentityUserRoles { get; set; }
         public DbSet<Poll> Polls { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         public DbSet<User> Users { get; set; }
 
@@ -36,6 +37,11 @@ namespace Probel.Arbitrium.Models
             modelBuilder.Entity<Choice>()
                 .HasOne(p => p.Poll)
                 .WithMany(p => p.Choices)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+                .HasMany(p => p.Decisions)
+                .WithOne(p => p.User)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<IdentityUserRole<long>>().HasKey(p => new { p.UserId, p.RoleId });

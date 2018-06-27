@@ -1,0 +1,15 @@
+﻿@model AppConfigurationViewModel
+<h2>Configuration</h2>
+<hr />
+<form asp-action="Configuration" method="post">
+    <div class="form-group">
+        <div class="form-check">
+            <input asp-for="@Model.IsRegistrationEnabled" class="form-check-input" />
+            <label asp-for="@Model.IsRegistrationEnabled" class="form-check-label">Enregistrement activé</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="Mettre à jour" />
+        <a asp-action="ListUsers" class="btn btn-default">Annuler</a>
+    </div>
+</form>
