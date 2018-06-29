@@ -1,0 +1,29 @@
+﻿@model NewLoginViewModel
+<h2>Changer le mot de passe</h2>
+<hr />
+@if (ViewData["Message"] != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewData["Message"]
+    </div>
+}
+<form asp-action="Edit" asp-controller="Login" method="post">
+    <div class="form-group">
+        <label asp-for="UserName" class="control-label">Login</label>
+        <input asp-for="UserName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label">Mot de passe</label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PasswordConfirmation" class="control-label">Confirmation mot de passe</label>
+        <input asp-for="PasswordConfirmation" class="form-control" />
+        <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary" value="Mettre à jour" />
+        <a asp-action="Connect" class="btn btn-default">Annuler</a>
+    </div>
+</form>

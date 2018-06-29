@@ -1,0 +1,26 @@
+﻿@model RawPollViewModel
+<h2>Editer une élection</h2>
+<form asp-action="EditPoll" role="Form">
+    <div class="form-group">
+        <label asp-for="StartDate" class="form-check-label">Début de l'élection</label>
+        <input type="datetime" asp-for="StartDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate" class="form-check-label">Fin de l'élection</label>
+        <input type="datetime" asp-for="EndDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Question" class="form-check-label"></label>
+        <input asp-for="@Model.Question" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Choices" class="form-check-label">Choix</label>
+        <textarea asp-for="@Model.Choices" rows="10" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <hr />
+        <button id="btn" type="submit" class="btn btn-primary">Editer</button>
+        <a asp-action="ListPolls" class="btn btn-link">Annuler</a>
+        <input asp-for="@Model.PollId" class="form-control" hidden />
+    </div>
+</form>

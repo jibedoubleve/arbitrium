@@ -1,0 +1,36 @@
+﻿@model PollResultViewModel
+<h2>@Html.DisplayFor(mi => Model.Question)</h2>
+<hr />
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th></th>
+            <th>Réponse</th>
+            <th>Compte</th>
+            <th>Resultat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var choice in Model.Choices)
+        {
+            <tr>
+                <td width="1%">
+                    @if (choice.IsYour)
+                    {
+                        <span class="badge badge-info">Ton choix</span>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(im => choice.Text)
+                </td>
+                <td>@Html.DisplayFor(im => choice.Count)</td>
+                <td><div class="progress-bar" role="progressbar" style="width: @choice.Percentage%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@choice.Percentage.ToString("0.#") %</div></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<hr />
+
+<div>
+    <a asp-action="ListResults" class="btn btn-link">Retour</a>
+</div>
