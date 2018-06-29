@@ -38,32 +38,40 @@ namespace Probel.Arbitrium.Controllers
         [HttpGet, Authorize]
         public async Task<IActionResult> ListResults()
         {
-            var query = new QueryPolls(PollContext);
+            var query = new PollQueryService(PollContext);
             var uid = await _auth.GetConnectedUserIdAsync();
-            var newPolls = await query.GetNewPollsAsync(uid);
-            var oldPolls = await query.GetOldPollsAsync(uid);
+            var runningPolls = await query.GetRunningPollsAsync(uid);
 
-            var vm = new PollCollectionViewModel()
-            {
-                NewPolls = newPolls,
-                OldPolls = oldPolls,
-            };
-            return View(vm);
+            return View(runningPolls);
         }
 
         [HttpGet, Authorize]
         public async Task<IActionResult> ListNewPolls()
         {
-            var query = new QueryPolls(PollContext);
+            var query = new PollQueryService(PollContext);
             var uid = await _auth.GetConnectedUserIdAsync();
             var newPolls = await query.GetNewPollsAsync(uid);
 
-            var vm = new PollCollectionViewModel()
-            {
-                NewPolls = newPolls,
-            };
-            return View(vm);
+            return View(newPolls);
 
+        }
+
+        [HttpGet, Authorize]
+        public async Task<IActionResult> ListSoonPolls()
+        {
+            var query = new PollQueryService(PollContext);
+            var soonPolls = await query.GetSoonPollsAsync();
+
+            return View(soonPolls);
+        }
+
+        [HttpGet, Authorize]
+        public async Task<IActionResult> Choices(long pollId)
+        {
+            var poll = await (from p in PollContext.Polls.Include(p => p.Choices)
+                              where p.Id == pollId
+                              select p).SingleAsync();
+            return View(poll);
         }
 
         [HttpGet, Authorize]
@@ -76,7 +84,7 @@ namespace Probel.Arbitrium.Controllers
             if (user == null) { throw new EntityNotFoundException(typeof(User), userId); }
             if (poll == null) { throw new EntityNotFoundException(typeof(Poll), pollId); }
 
-            var pollResult = await new QueryPolls(PollContext).GetResultAsync(await _auth.GetConnectedUserIdAsync(), pollId);
+            var pollResult = await new PollQueryService(PollContext).GetResultAsync(await _auth.GetConnectedUserIdAsync(), pollId);
 
             return View(pollResult);
         }
@@ -115,7 +123,7 @@ namespace Probel.Arbitrium.Controllers
             PollContext.Decisions.Add(decision);
             await PollContext.SaveChangesAsync();
 
-            return RedirectToAction("ListResult", "Poll");
+            return RedirectToAction("ListResults", "Poll");
         }
 
         #endregion Methods

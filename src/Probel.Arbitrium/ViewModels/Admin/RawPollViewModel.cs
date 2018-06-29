@@ -13,7 +13,7 @@ namespace Probel.Arbitrium.ViewModels.Admin
 
         [DataType(DataType.DateTime)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.DateTime)]
-        public DateTime EndDate { get; set; } = DateTime.Now.AddHours(1);
+        public DateTime EndDate { get; set; } = DateTime.Now.AddHours(6);
 
         public long PollId { get; set; }
 
@@ -22,9 +22,7 @@ namespace Probel.Arbitrium.ViewModels.Admin
 
         [DataType(DataType.DateTime)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.DateTime)]
-        public DateTime StartDate { get; set; } = DateTime.Now;
-
-        public long UserId { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now.AddMinutes(5);
 
         #endregion Properties
     }

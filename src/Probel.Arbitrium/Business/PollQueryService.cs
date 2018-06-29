@@ -2,6 +2,7 @@
 using Probel.Arbitrium.Exceptions;
 using Probel.Arbitrium.Models;
 using Probel.Arbitrium.ViewModels.Admin;
+using Probel.Arbitrium.ViewModels.Polls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Probel.Arbitrium.Business
 {
-    public class QueryPolls
+    public class PollQueryService
     {
         #region Fields
 
@@ -18,7 +19,7 @@ namespace Probel.Arbitrium.Business
         #endregion Fields
 
         #region Constructors
-        public QueryPolls(PollContext context)
+        public PollQueryService(PollContext context)
         {
             Context = context;
         }
@@ -61,12 +62,25 @@ namespace Probel.Arbitrium.Business
             return polls;
         }
 
-        public async Task<IEnumerable<Poll>> GetOldPollsAsync(long userId)
+        public async Task<IEnumerable<ResultViewModel>> GetRunningPollsAsync(long userId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.Now.ToUniversalTime();
             var polls = await (from p in Context.Polls.Include(p => p.Choices).ThenInclude(c => c.Decisions)
-                               where 0 != p.Choices.Where(c => c.Decisions.Where(d => d.User.Id == userId).Count() > 0).Count()
-                               || p.EndDate < now
+                               where p.StartDate < now                               
+                               select new ResultViewModel
+                               {
+                                   Poll = p,
+                                   HasUserAnswer = (0 < p.Choices.Where(c => c.Decisions.Where(d => d.User.Id == userId).Count() > 0).Count())
+                               }).ToListAsync();
+
+            return polls.OrderByDescending(e=>e.Poll.IsOpen).ThenBy(e=>e.HasUserAnswer);
+        }
+
+        public async Task<IEnumerable<Poll>> GetSoonPollsAsync()
+        {
+            var now = DateTime.Now.ToUniversalTime();
+            var polls = await (from p in Context.Polls.Include(p => p.Choices).ThenInclude(c => c.Decisions)
+                               where p.StartDate > now
                                select p).ToListAsync();
 
             return polls;
@@ -130,8 +144,10 @@ namespace Probel.Arbitrium.Business
 
         public async Task<IEnumerable<Poll>> GetEditablePollsAsync()
         {
+            var now = DateTime.Now.ToUniversalTime();
             var polls = await (from p in Context.Polls.Include(p => p.Choices).ThenInclude(c => c.Decisions)
                                where (p.Choices.Where(f => f.Decisions.Count() > 0).Count() == 0)
+                               && p.StartDate >= now
                                select p).ToListAsync();
             return polls;
         }

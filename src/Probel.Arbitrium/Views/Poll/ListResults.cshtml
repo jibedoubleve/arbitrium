@@ -1,26 +1,33 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
-@model PollCollectionViewModel
+@model IEnumerable<ResultViewModel>
 
-<h2>Tes votes</h2>
+<h2>Les résultats...</h2>
 <table class="table">
     <thead class="thead-light">
         <tr>
+            <th></th>
             <th scope="col">Question</th>
             <th scope="col">Status</th>
-            <th scope="col">Temps restant</th>
+            <th scope="col">Fini dans...</th>
             <th scope="col"></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.OldPolls)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Question)
+                <td width="1%">
+                    @if (item.HasUserAnswer)
+                    {
+                        <span class="badge badge-info">A voté</span>
+                    }
                 </td>
                 <td>
-                    @if (item.IsOpen)
+                    @Html.DisplayFor(modelItem => item.Poll.Question)
+                </td>
+                <td>
+                    @if (item.Poll.IsOpen)
                     {
                         <span class="badge badge-success">En cours...</span>
                     }
@@ -30,16 +37,16 @@
                     }
                 </td>
                 <td>
-                    @if (item.IsOpen)
+                    @if (item.Poll.IsOpen)
                     {
-                        @Html.DisplayFor(modelItem => item.RemainingTime)
+                        @Html.DisplayFor(modelItem => item.Poll.RemainingTimeBeforeEnd)
                     }
                 </td>
                 <td style="width:20%">
                     @{
-                        var text = (item.IsOpen) ? "Résultats temporaire" : "Résultats";
+                        var text = (item.Poll.IsOpen) ? "Résultats temporaires" : "Résultats";
                     }
-                    <a asp-action="Result" asp-route-pollId="@item.Id">@text</a>
+                    <a asp-action="Result" asp-route-pollId="@item.Poll.Id">@text</a>
                 </td>
             </tr>
         }

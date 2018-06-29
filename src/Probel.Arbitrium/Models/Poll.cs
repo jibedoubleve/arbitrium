@@ -32,8 +32,15 @@ namespace Probel.Arbitrium.Models
         public bool IsOpen => (DateTime.Now.ToUniversalTime() <= EndDate);
 
         [NotMapped]
+        public bool IsStarted => (DateTime.Now.ToUniversalTime() > StartDate);
+
+        [NotMapped]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.TimeSpan)]
-        public TimeSpan RemainingTime => EndDate - StartDate;
+        public TimeSpan RemainingTimeBeforeEnd => StartDate - DateTime.Now.ToUniversalTime();
+
+        [NotMapped]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.TimeSpan)]
+        public TimeSpan RemainingTimeBeforeStart => EndDate - DateTime.Now.ToUniversalTime();
 
         #endregion Properties
     }

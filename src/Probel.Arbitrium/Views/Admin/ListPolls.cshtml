@@ -4,6 +4,8 @@
     <thead class="thead-light">
         <tr>
             <th scope="col">Election</th>
+            <th scope="col">Temps avant début</th>
+            <th scope="col">status</th>
             <th scope="col">Fin de l'élection</th>
             <th scope="col"></th>
         </tr>
@@ -14,6 +16,23 @@
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Question)
+                </td>
+                <td>
+                    @if (!item.IsStarted)
+                    {
+                        @Html.DisplayFor(modelItem => item.RemainingTimeBeforeEnd)
+                    }
+                    else { <label>N.A.</label>}
+                </td>
+                <td>
+                    @if (item.IsStarted)
+                    {
+                        <span class="badge badge-success">Démarré</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-secondary">En attente</span>
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelITem => item.EndDateLocal)
@@ -34,7 +53,7 @@
 
                                     <!-- Modal body -->
                                     <div class="modal-body">
-                                        Veux-tu effacer cet utilisateur?
+                                        Veux-tu effacer l'élection '@item.Question'?
                                     </div>
 
                                     <!-- Modal footer -->

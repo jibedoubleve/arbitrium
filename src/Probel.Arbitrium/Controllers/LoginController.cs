@@ -87,6 +87,12 @@ namespace Probel.Arbitrium.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConnectConfirmed(LoginViewModel user)
         {
+            if (user == null) { throw new ArgumentException(nameof(user)); }
+            else if (string.IsNullOrEmpty(user.Login)) { ViewData["Message"] = "Login vide!"; }
+            else if (string.IsNullOrEmpty(user.Password)) { ViewData["Message"] = "Mot de passe vide!"; }
+
+            if (ViewData["Message"] != null) { return View(user); }
+
             var result = await SignInManager.PasswordSignInAsync(user.Login,
                                                                  user.Password,
                                                                  true, lockoutOnFailure: false);
@@ -96,7 +102,11 @@ namespace Probel.Arbitrium.Controllers
                 var u = await UserManager.FindByEmailAsync(user.Login);
                 return RedirectToAction("ListNewPolls", "Poll");
             }
-            else { throw new ConnectionException(result); }
+            else
+            {
+                ViewData["Message"] = "Mot de passe incorrect";
+                return View(user);
+            }
         }
 
         [HttpGet, AllowAnonymous]
@@ -125,7 +135,10 @@ namespace Probel.Arbitrium.Controllers
                 }
                 else { throw new IdentityException(result.Errors); }
             }
-            else { return View(new NewLoginViewModel()); }
+            else
+            {
+                ViewData["Message"] = "Le mot de passe et la onfirmation ne correspondent pas!";
+                return View(new NewLoginViewModel()); }
         }
 
         [HttpPost, ValidateAntiForgeryToken, Authorize]
@@ -156,7 +169,11 @@ namespace Probel.Arbitrium.Controllers
                 var result = await UserManager.ResetPasswordAsync(user, token, model.Password);
                 return RedirectToAction("List", "Poll");
             }
-            else { throw new ServerException("Password and password confirmation does not match."); }
+            else
+            {
+                ViewData["Message"] = "Le mot de passe et la confirmation ne correspondent pas!";
+                return View(model);
+            }
         }
 
         #endregion Methods

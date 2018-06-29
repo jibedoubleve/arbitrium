@@ -1,6 +1,12 @@
 ﻿@model AppConfigurationViewModel
 <h2>Configuration</h2>
 <hr />
+@if (ViewData["Message"] != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewData["Message"]
+    </div>
+}
 <form asp-action="Configuration" method="post">
     <div class="form-group">
         <div class="form-check">

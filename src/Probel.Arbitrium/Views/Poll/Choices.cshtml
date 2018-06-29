@@ -1,0 +1,19 @@
+﻿@model Poll
+<h2>Choix</h2>
+<hr />
+<div>
+    <h3>@Html.DisplayFor(m => m.Question)</h3>
+    <hr />
+</div>
+<form asp-action="Vote" role="form">
+    @foreach (var choice in Model.Choices)
+    {
+        <ul>
+            <li>@choice.Text</li>
+        </ul>
+    }
+    <div>
+        <hr />
+        <a asp-action="ListSoonPolls" asp-controller="Poll" class="btn btn-link">Retour</a>
+    </div>
+</form>
