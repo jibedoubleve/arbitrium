@@ -1,4 +1,4 @@
-﻿@model PollCollectionViewModel
+﻿@model IEnumerable<Poll>
 <h2>Elections éditables</h2>
 <table class="table">
     <thead class="thead-light">
@@ -11,7 +11,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.NewPolls)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>

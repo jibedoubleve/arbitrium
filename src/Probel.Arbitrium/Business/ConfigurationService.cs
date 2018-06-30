@@ -59,14 +59,20 @@ namespace Probel.Arbitrium.Business
 
         public async Task<ConfigurationViewModel> GetFullConfiguration()
         {
-            var r = new ConfigurationViewModel();
+            var r = new ConfigurationViewModel { IsRegistrationEnabled = true };
 
             var list = await _pollContext.Settings.ToListAsync();
 
             var k = (from kv in list
                      where kv.Key == ConfigKeys.RegistrationStatus
-                     select kv.Value.ToLower()).Single();
-            r.IsRegistrationEnabled = (k == ConfigValues.Enabled);
+                     select kv.Value.ToLower()).SingleOrDefault();
+
+            if (k == null)
+            {
+                _pollContext.Settings.Add(new Setting { Key = ConfigKeys.RegistrationStatus, Value = ConfigValues.Enabled });
+                await _pollContext.SaveChangesAsync();
+            }
+            else { r.IsRegistrationEnabled = (k == ConfigValues.Enabled); }
 
             return r;
         }

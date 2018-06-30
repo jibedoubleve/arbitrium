@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Probel.Arbitrium.Business;
 using Probel.Arbitrium.Models;
@@ -11,6 +12,21 @@ namespace Probel.Arbitrium
 {
     public class Startup
     {
+        #region Constructor
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        #endregion Constructor
+
+        #region Properties
+
+        public IConfiguration Configuration { get; }
+
+        #endregion Properties
+
         #region Methods
 
         private void SetupIdentity(IServiceCollection services)
@@ -82,13 +98,17 @@ namespace Probel.Arbitrium
             services.AddTransient<IConfigurationService, ConfigurationService>();
 
             services.AddMvc();
+            var connection = Configuration["ConnectionString"];
+            var mode = Configuration["Mode"]?.ToLower() ?? string.Empty;
 
-            // var connection =
-            // @"Server=(localdb)\mssqllocaldb;Database=PollsDb;Trusted_Connection=True;MultipleActiveResultSets=true";
-            // services.AddDbContext<PollContext>(options => options.UseSqlServer(connection));
-            var connection = @"Data Source=C:\Users\jibedoubleve\Desktop\sqlite.db";
-            services.AddDbContext<PollContext>(options => options.UseSqlite(connection));
-
+            if(mode == "mariadb" || mode == "mysql" )
+            {
+                services.AddDbContext<PollContext>(options => options.UseMySql(connection));
+            }
+            else if(mode == "sqlite")
+            {
+                services.AddDbContext<PollContext>(options => options.UseSqlite(connection));
+            }
             SetupIdentity(services);
         }
 
