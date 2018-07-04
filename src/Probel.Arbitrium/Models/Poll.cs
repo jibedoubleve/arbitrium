@@ -36,11 +36,11 @@ namespace Probel.Arbitrium.Models
 
         [NotMapped]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.TimeSpan)]
-        public TimeSpan RemainingTimeBeforeEnd => StartDate - DateTime.Now.ToUniversalTime();
+        public TimeSpan RemainingTimeBeforeEnd => EndDate - DateTime.Now.ToUniversalTime();
 
         [NotMapped]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = Format.TimeSpan)]
-        public TimeSpan RemainingTimeBeforeStart => EndDate - DateTime.Now.ToUniversalTime();
+        public TimeSpan RemainingTimeBeforeStart => StartDate - DateTime.Now.ToUniversalTime();
 
         #endregion Properties
     }
