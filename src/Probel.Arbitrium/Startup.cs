@@ -32,8 +32,8 @@ namespace Probel.Arbitrium
         private void SetupIdentity(IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole<long>>()
-                       .AddEntityFrameworkStores<PollContext>()
-                       .AddDefaultTokenProviders();
+                    .AddEntityFrameworkStores<PollContext>()
+                    .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -101,11 +101,11 @@ namespace Probel.Arbitrium
             var connection = Configuration["ConnectionString"];
             var mode = Configuration["Mode"]?.ToLower() ?? string.Empty;
 
-            if(mode == "mariadb" || mode == "mysql" )
+            if (mode == "mariadb" || mode == "mysql")
             {
                 services.AddDbContext<PollContext>(options => options.UseMySql(connection));
             }
-            else if(mode == "sqlite")
+            else if (mode == "sqlite")
             {
                 services.AddDbContext<PollContext>(options => options.UseSqlite(connection));
             }
